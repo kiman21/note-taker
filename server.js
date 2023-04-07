@@ -1,40 +1,15 @@
-const express = require('express');
-const path = require('path');
+const express = require("express");
 const app = express();
-const db = require ("./db/db.json");
-const fs = require ("fs");
-const PORT = process.env.PORT || 3000;
-const { v4: uuidv4 } = require('uuid');
 
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+const PORT = process.env.PORT || 3001;
+
 app.use(express.static('public'));
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
-app.get("/notes", (req,res)=>{
-  res.sendFile(path.join(__dirname,"./public/notes.html"))
-})
+const allRoutes = require("./controllers/index.js");
+app.use(allRoutes)
 
-app.get("/api/notes",(req,res) => {
-  return res.json(db)
-})
-
-app.post("/api/notes",(req,res)=>{
-  req.body.id= uuidv4()
-  db.push(req.body)
-  fs.writeFile("db/db.json", JSON.stringify(db, null, 4), (err) => {
-      if (err) {
-        res.status(500).send("Error, could not post");
-        throw err;
-      } else {
-        res.send("Note updated!");
-      }
-    });
-  })
-
-app.get("*", (req,res)=>{
-  res.sendFile(path.join(__dirname,"./public/index.html"))
-})
-
-app.listen(Port,function(){
-  console.log("App listening on port ${PORT}")
-})
+app.listen(PORT, function () {
+  console.log("listening on port " + PORT);
+});
